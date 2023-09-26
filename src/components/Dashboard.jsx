@@ -27,17 +27,17 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      setIsLoadingData(true); // Start loading
+      setIsLoadingData(true); 
       const querySnapshot = await getDocs(collection(database, "students"));
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setStudentsData(data);
-      setIsLoadingData(false); // Stop loading after data is fetched
+      setIsLoadingData(false); 
     } catch (error) {
       console.error("Error fetching data from Firestore:", error);
-      setIsLoadingData(false); // Stop loading on error
+      setIsLoadingData(false); 
     }
   };
 
@@ -95,7 +95,7 @@ const Dashboard = () => {
 
   return (
     <div className="container">
-      {isLoadingData ? ( // Conditional rendering of the Loader component
+      {isLoadingData ? ( 
         <Loader />
       ) : (
         !isLoadingData && studentsData.length > 0 ? (
