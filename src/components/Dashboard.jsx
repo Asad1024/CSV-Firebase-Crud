@@ -59,6 +59,10 @@ const Dashboard = () => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.type !== 'application/vnd.ms-excel' && file.type !== 'text/csv') {
+        toast.error('Invalid file type. Please select a CSV file.');
+        return;
+      }
       try {
         const fileText = await file.text();
         const parsedData = parseCSV(fileText);
