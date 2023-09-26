@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { database } from "../../firebaseConfig";
+import { toast } from "react-toastify";
 
 const StudentTable = ({ studentsData, fetchData }) => {
   const [editingStudents, setEditingStudents] = useState({});
@@ -27,6 +28,7 @@ const StudentTable = ({ studentsData, fetchData }) => {
         age: null,
         marks: null,
       });
+      toast.success("Successfully Updated")
     } catch (error) {
       console.error("Error updating student:", error);
     }
@@ -45,6 +47,7 @@ const StudentTable = ({ studentsData, fetchData }) => {
     try {
       await deleteDoc(doc(database, "students", studentId));
       fetchData();
+      toast.success("Successfully Deleted")
     } catch (error) {
       console.error("Error deleting student:", error);
     }
@@ -122,7 +125,7 @@ const StudentTable = ({ studentsData, fetchData }) => {
                     }
                   />
                 ) : (
-                  student.marks
+                  `${student.marks}%`
                 )}
               </td>
               <td>

@@ -118,6 +118,26 @@ button {
   margin-top: 5px;
 }
 
+button:hover {
+  background-color: #0563c7;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  transform: translateY(-2px);
+}
+
+/* Loader styles */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  height: 60vh;
+}
+
+.loader-image {
+  width: 100px; /* Adjust the size of the loader image */
+}
+
+
 /* Media Query for smaller screens */
 @media screen and (max-width: 600px) {
   nav {

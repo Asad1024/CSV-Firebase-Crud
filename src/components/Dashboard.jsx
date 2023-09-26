@@ -6,6 +6,8 @@ import {
 } from "firebase/firestore";
 import { database } from "../firebaseConfig";
 import StudentTable from "./Student/StudentTable";
+import { toast } from "react-toastify";
+import Loader from "./Loader";
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -16,10 +18,8 @@ const Dashboard = () => {
   });
   
   const [csvData, setCsvData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoadingData, setIsLoadingData] = useState(false);
   console.log(csvData);
-  console.log(setIsLoading);
 
   useEffect(() => {
     fetchData();
@@ -27,22 +27,30 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
+      setIsLoadingData(true); // Start loading
       const querySnapshot = await getDocs(collection(database, "students"));
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setStudentsData(data);
+      setIsLoadingData(false); // Stop loading after data is fetched
     } catch (error) {
       console.error("Error fetching data from Firestore:", error);
+      setIsLoadingData(false); // Stop loading on error
     }
   };
 
   const handleCreate = async () => {
+    if (!newStudent.name || !newStudent.age || !newStudent.marks) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
     try {
       await addDoc(collection(database, "students"), newStudent);
       setNewStudent({ name: "", age: "", marks: "" });
       fetchData();
+      toast.success("Successfully Created");
     } catch (error) {
       console.error("Error creating a new student:", error);
     }
@@ -87,48 +95,55 @@ const Dashboard = () => {
 
   return (
     <div className="container">
-      {!isLoading && studentsData.length > 0 ? (
-        <>
-          <div className="newStudent">
-            <h2 style={{ marginBottom: "10px" }}>Add New Student</h2>
-            <input
-              type="text"
-              placeholder="Name"
-              value={newStudent.name}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, name: e.target.value })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Age"
-              value={newStudent.age}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, age: e.target.value })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Marks"
-              value={newStudent.marks}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, marks: e.target.value })
-              }
-            />
-            <button
-              onClick={handleCreate}
-              style={{ width: "30%", margin: "10px 0 20px 0", padding: "10px" }}
-            >
-              Add Student
-            </button>
-          </div>
-          <StudentTable studentsData={studentsData} fetchData={fetchData} />
-        </>
+      {isLoadingData ? ( // Conditional rendering of the Loader component
+        <Loader />
       ) : (
-        <div className="import">
-          <span>Import File</span>
-          <input type="file" accept=".csv" onChange={handleFileUpload} className="importInput" />
-        </div>
+        !isLoadingData && studentsData.length > 0 ? (
+          <>
+            <div className="newStudent">
+              <h2 style={{ marginBottom: "10px" }}>Add New Student</h2>
+              <input
+                type="text"
+                placeholder="Name"
+                value={newStudent.name}
+                required
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, name: e.target.value })
+                }
+              />
+              <input
+                type="number"
+                placeholder="Age"
+                value={newStudent.age}
+                required
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, age: e.target.value })
+                }
+              />
+              <input
+                type="number"
+                placeholder="Marks"
+                value={newStudent.marks}
+                required
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, marks: e.target.value })
+                }
+              />
+              <button
+                onClick={handleCreate}
+                style={{ width: "30%", margin: "10px 0 20px 0", padding: "10px" }}
+              >
+                Add Student
+              </button>
+            </div>
+            <StudentTable studentsData={studentsData} fetchData={fetchData} />
+          </>
+        ) : (
+          <div className="import">
+            <span>Import File</span>
+            <input type="file" accept=".csv" onChange={handleFileUpload} className="importInput" />
+          </div>
+        )
       )}
     </div>
   );
